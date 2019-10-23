@@ -29,8 +29,8 @@ spec:
         - name: shared-data
           emptyDir: {}
       initContainers:
-        # Vault container
-        - name: vault-agent-auth-{{ include "..name" . }}
+        # Vault container, auth and get token
+        - name: vault-agent-auth
           image: vault
           env:
             - name: VAULT_ADDR
@@ -50,6 +50,8 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command:
+            {{ toYaml .Values.command | nindent 12 }}
           volumeMounts:
             - name: configs 
               mountPath: /etc/postgrest/
@@ -62,7 +64,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80 
+              containerPort: 3000 
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -74,7 +76,7 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-        # Consul Template container
+        # Consul Template Container for dynamic configs
         - name: consul-template
           image: hashicorp/consul-template:alpine
           args:

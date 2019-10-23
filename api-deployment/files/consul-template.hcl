@@ -7,7 +7,7 @@ vault {
 }
 
 template {
-  destination = "/etc/configs/dynamic/shhhh"
+  destination = "/etc/configs/dynamic/postgrest.conf"
   contents = <<EOH
 {{- with secret "secret/postgrest/test" }}
 db-uri  = "{{.Data.db_string_pls_delete_and_use_backend}}"{{ end }}

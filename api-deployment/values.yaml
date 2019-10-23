@@ -1,25 +1,18 @@
-# Default values for ..
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 1
 
 image:
-  # repository: postgrest/postgrest
-  # tag: v6.0.2
-  repository: nginx
-  tag: latest
+  repository: postgrest/postgrest
+  tag: v6.0.2
   pullPolicy: IfNotPresent
 
 command:
   - "postgrest"
-  - "/etc/postgrest/postgrest.conf"
+  - "/etc/configs/dynamic/postgrest.conf"
 
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
@@ -30,11 +23,11 @@ podSecurityContext:
 
 securityContext:
   capabilities:
-    add:
-      - IPC_LOCK
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
 
 service:
   type: ClusterIP

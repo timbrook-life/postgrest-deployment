@@ -4,12 +4,6 @@ kind: ConfigMap
 metadata:
   name: "configs-{{ include "..name" . }}"
 data:
-  postgrest.conf: |
-    db-uri  = "@/var/run/config/db_string"
-    db-schema = "public"
-    db-anon-role = "anonymous"
-    server-host	= "0.0.0.0"
-    jwt-secret = "@/var/run/secrets/rsa.jwk.pub"
   vault-agent-config.hcl: |
     exit_after_auth = true
     pid_file = "/home/vault/pidfile"

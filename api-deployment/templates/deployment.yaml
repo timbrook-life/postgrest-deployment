@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "..fullname" . }}
+  labels:
+{{ include "..labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "..name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "..name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ template "..serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: configs 
+          configMap:
+            name: "configs-{{ include "..name" . }}"
+        - name: vault-token
+          emptyDir:
+            medium: Memory
+        - name: shared-data
+          emptyDir: {}
+      initContainers:
+        # Vault container
+        - name: vault-agent-auth-{{ include "..name" . }}
+          image: vault
+          env:
+            - name: VAULT_ADDR
+              value: http://vault-prod.security.svc.cluster.local:8200
+          args:
+            - "agent"
+            - "-config=/etc/vault/vault-agent-config.hcl"
+            - "-log-level=debug"
+          volumeMounts:
+            - name: configs
+              mountPath: /etc/vault
+            - name: vault-token
+              mountPath: /home/vault
+      containers:
+        # App Container
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          volumeMounts:
+            - name: configs 
+              mountPath: /etc/postgrest/
+            - name: vault-token
+              mountPath: /var/run/vault/
+            - name: configs
+              mountPath: /var/run/config/
+            - name: shared-data
+              mountPath: /etc/configs/dynamic/
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80 
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        # Consul Template container
+        - name: consul-template
+          image: hashicorp/consul-template:alpine
+          args:
+            - "-config=/etc/consul-template/consul-template-config.hcl"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: vault-token
+              mountPath: /home/vault
+            - name: configs
+              mountPath: /etc/consul-template
+            - name: shared-data
+              mountPath: /etc/configs/dynamic/
+          env:
+            - name: HOME
+              value: /home/vault
+            - name: VAULT_ADDR
+              value: http://vault-prod.security.svc.cluster.local:8200
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

@@ -29,6 +29,8 @@ jobs:
     serial: true
     plan:
       - get: postgrest-deployment
+        params:
+          skip_download: true
         trigger: true
       - get: auth
       - put: helm-push-local-chart

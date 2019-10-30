@@ -12,6 +12,8 @@ command:
 nameOverride: ""
 fullnameOverride: ""
 
+vaultAddr: "http://vault.core.svc.cluster.local:8200"
+
 serviceAccount:
   create: true
   # The name of the service account to use.

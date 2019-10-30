@@ -34,7 +34,7 @@ spec:
           image: vault
           env:
             - name: VAULT_ADDR
-              value: http://vault-prod.security.svc.cluster.local:8200
+              value: {{ .Values.vaultAddr }} 
           args:
             - "agent"
             - "-config=/etc/vault/vault-agent-config.hcl"
@@ -93,7 +93,7 @@ spec:
             - name: HOME
               value: /home/vault
             - name: VAULT_ADDR
-              value: http://vault-prod.security.svc.cluster.local:8200
+              value: {{ .Values.vaultAddr }} 
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

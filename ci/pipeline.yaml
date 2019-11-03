@@ -16,8 +16,6 @@ resources:
     source:
       uri: "https://github.com/timbrook-life/postgrest-deployment"
       branch: master
-      paths:
-        - via_appshell
   - name: auth
     type: kube-authenticator
     icon: lock-outline

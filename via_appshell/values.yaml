@@ -2,7 +2,6 @@ replicaCount: 1
 
 image:
   repository: 7imbrook/postgrest
-  tag: sha256:c47009cf3ef40bf2ce37b4997b7e350f0bd44c1aad3ba06951025b6a777b252a
 
 healthEndpoint: "/"
 

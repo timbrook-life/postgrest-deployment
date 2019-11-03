@@ -28,7 +28,7 @@ exec {
   splay = "2s"
 
   env {
-    pristine = true
+    pristine = false
   }
   reload_signal = "SIGHUP"
   kill_signal = "SIGINT"

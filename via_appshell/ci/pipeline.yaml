@@ -1,0 +1,73 @@
+---
+resource_types:
+  - name: helm
+    type: docker-image
+    source:
+      repository: linkyard/concourse-helm-resource
+  - name: kube-authenticator
+    type: docker-image
+    source:
+      repository: 7imbrook/kube_authenticate
+
+resources:
+  - name: postgrest-deployment
+    type: git
+    icon: github-circle
+    source:
+      uri: "https://github.com/timbrook-life/postgrest-deployment"
+      branch: master
+      paths:
+        - via_appshell
+  - name: auth
+    type: kube-authenticator
+    icon: lock-outline
+    source:
+      token: ((digital_ocean.token))
+  - name: postgrest
+    type: docker-image
+    source:
+      username: ((docker.username))
+      password: ((docker.password))
+      repository: 7imbrook/postgrest
+  - name: helm-release
+    type: helm
+    source:
+      repos:
+        - name: personal
+          url: https://helm-charts.sfo2.digitaloceanspaces.com
+
+jobs:
+  - name: Build
+    serial: true
+    plan:
+      - get: postgrest-deployment
+        trigger: true
+      - put: postgrest
+        params:
+          build: postgrest-deployment/via_appshell/
+        get_params:
+          skip_download: true
+        inputs:
+          - postgrest-deployment
+  - name: Deploy
+    serial: true
+    plan:
+      - get: postgrest-deployment
+      - get: postgrest
+        trigger: true
+        passed:
+          - Build
+      - get: auth
+      - put: helm-release
+        params:
+          release: api
+          namespace: production
+          kubeconfig_path: auth/config.yaml
+          chart: personal/appshell
+          version: 1.1.1
+          values: postgrest-deployment/via_appshell/values.yaml
+          show_diff: true
+          override_values:
+            - key: image.sha
+              path: postgrest/digest
+              type: string

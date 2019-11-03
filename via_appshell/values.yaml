@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: 7imbrook/postgrest
+  tag: sha256:c47009cf3ef40bf2ce37b4997b7e350f0bd44c1aad3ba06951025b6a777b252a
+
+healthEndpoint: "/"
+
+container:
+  port: 3000
+
+ingress:
+  enabled: true
+  hosts:
+    - timbrook.tech
+    - timbrook.dev
+    - timbrook.life
+  paths:
+   - /api/p/
+
+vault:
+  enabled: true
+  host: "http://vault.core.svc.cluster.local"
+  role: "api"
+
+resources:
+  limits:
+   cpu: 200m
+   memory: 256Mi
+  requests:
+   cpu: 100m
+   memory: 128Mi

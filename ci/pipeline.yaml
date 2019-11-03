@@ -16,27 +16,68 @@ resources:
     source:
       uri: "https://github.com/timbrook-life/postgrest-deployment"
       branch: master
+      paths:
+        - via_appshell
   - name: auth
     type: kube-authenticator
     icon: lock-outline
     source:
       token: ((digital_ocean.token))
-  - name: helm-push-local-chart
+  - name: postgrest
+    type: docker-image
+    source:
+      username: ((docker.username))
+      password: ((docker.password))
+      repository: 7imbrook/postgrest
+  - name: helm-release
     type: helm
+    source:
+      repos:
+        - name: personal
+          url: https://helm-charts.sfo2.digitaloceanspaces.com
+  - name: appshell-version
+    type: semver
+    source:
+      driver: s3
+      bucket: internal
+      key: versions/appshell
+      endpoint: sfo2.digitaloceanspaces.com
+      access_key_id: ((s3.id))
+      secret_access_key: ((s3.key))
 
 jobs:
-  - name: Deploy Chart
+  - name: Build
     serial: true
     plan:
       - get: postgrest-deployment
-        params:
-          skip_download: true
         trigger: true
-      - get: auth
-      - put: helm-push-local-chart
+      - put: postgrest
         params:
-          release: postgrest
-          namespace: api
+          build: postgrest-deployment/
+        get_params:
+          skip_download: true
+        inputs:
+          - postgrest-deployment
+  - name: Deploy
+    serial: true
+    plan:
+      - get: postgrest-deployment
+      - get: postgrest
+        trigger: true
+        passed:
+          - Build
+      - get: auth
+      - get: appshell-version
+      - put: helm-release
+        params:
+          release: api
+          namespace: production
           kubeconfig_path: auth/config.yaml
-          chart: ./postgrest-deployment/api-deployment
-          values: ./postgrest-deployment/api-deployment/values.yaml
+          chart: personal/appshell
+          version: appshell-version/version
+          values: postgrest-deployment/values.yaml
+          show_diff: true
+          override_values:
+            - key: image.sha
+              path: postgrest/digest
+              type: string

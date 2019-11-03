@@ -35,6 +35,15 @@ resources:
       repos:
         - name: personal
           url: https://helm-charts.sfo2.digitaloceanspaces.com
+  - name: appshell-version
+    type: semver
+    source:
+      driver: s3
+      bucket: internal
+      key: versions/appshell
+      endpoint: sfo2.digitaloceanspaces.com
+      access_key_id: ((s3.id))
+      secret_access_key: ((s3.key))
 
 jobs:
   - name: Build
@@ -58,13 +67,14 @@ jobs:
         passed:
           - Build
       - get: auth
+      - get: appshell-version
       - put: helm-release
         params:
           release: api
           namespace: production
           kubeconfig_path: auth/config.yaml
           chart: personal/appshell
-          version: 1.1.1
+          version: appshell-version/version
           values: postgrest-deployment/via_appshell/values.yaml
           show_diff: true
           override_values:

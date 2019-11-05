@@ -26,8 +26,8 @@ vault:
 
 resources:
   limits:
-   cpu: 200m
-   memory: 256Mi
-  requests:
-   cpu: 100m
+   cpu: 80m
    memory: 128Mi
+  requests:
+   cpu: 20m
+   memory: 56Mi

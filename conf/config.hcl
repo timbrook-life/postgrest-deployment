@@ -1,16 +1,15 @@
 vault {
-  address = "http://vault.core.svc.cluster.local:8200"
+  address = "https://vault.timbrook.tech"
   ssl {
-    # This is terrible practice, will fix
-    enabled = false
-    verify = false
+    enabled = true
+    verify = true 
   }
   vault_agent_token_file = "/var/run/secrets/.vault-token"
   renew_token = true
 }
 
 consul {
-  address = "http://consul.core.svc.cluster.local:8500"
+  address = "https://consul.timbrook.tech"
 }
 
 ###
@@ -18,19 +17,20 @@ consul {
 #
 
 template {
-    destination = "/etc/postgrest.conf"
-    source = "/opt/conf/template/postgrest.conf"
+    // destination = "/etc/postgrest.conf"
+    destination = "./postgrest.conf"
+    source = "./conf/template/postgrest.conf"
     error_on_missing_key = true
 }
 
 exec {
-  command = "postgrest /etc/postgrest.conf"
+  command = "postgrest ./postgrest.conf"
   splay = "2s"
 
   env {
     pristine = false
   }
-  reload_signal = "SIGHUP"
+  reload_signal = "SIGUSR1"
   kill_signal = "SIGINT"
   kill_timeout = "2s"
 }

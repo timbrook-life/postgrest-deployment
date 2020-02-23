@@ -17,14 +17,13 @@ consul {
 #
 
 template {
-    // destination = "/etc/postgrest.conf"
-    destination = "./postgrest.conf"
-    source = "./conf/template/postgrest.conf"
+    destination = "/etc/postgrest.conf"
+    source = "/opt/conf/template/postgrest.conf"
     error_on_missing_key = true
 }
 
 exec {
-  command = "cat ./postgrest.conf"
+  command = "postgrest /etc/postgrest.conf"
   splay = "2s"
 
   env {

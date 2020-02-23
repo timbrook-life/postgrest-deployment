@@ -9,25 +9,16 @@ container:
   port: 3000
 
 ingress:
-  enabled: true
-  hosts:
-    - timbrook.tech
-    - timbrook.dev
-    - timbrook.life
-  annotations:
-    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
-  paths:
-   - /api/p/
-
+  enabled: false
 vault:
   enabled: true
-  host: "http://vault.core.svc.cluster.local"
-  role: "api"
+  host: "http://vault.default.svc.cluster.local"
+  role: "postgrest"
 
 resources:
   limits:
-   cpu: 120m
-   memory: 128Mi
+    cpu: 120m
+    memory: 128Mi
   requests:
-   cpu: 50m
-   memory: 56Mi
+    cpu: 50m
+    memory: 56Mi

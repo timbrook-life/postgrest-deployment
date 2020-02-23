@@ -1,5 +1,5 @@
 vault {
-  address = "http://vault.default.svc.cluster.local"
+  address = "http://vault.default.svc.cluster.local:8200"
   ssl {
     enabled = false
     verify = false 
@@ -9,7 +9,7 @@ vault {
 }
 
 consul {
-  address = "http://consul-server.default.svc.cluster.local"
+  address = "http://consul-server.default.svc.cluster.local:8500"
 }
 
 ###

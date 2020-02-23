@@ -4,6 +4,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag 7imbrook/postgrest:$GITHUB_SHA
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        uses: mr-smithers-excellent/docker-build-push@v2
+        with:
+          image: 7imbrook/postgrest
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}

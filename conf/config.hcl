@@ -24,7 +24,7 @@ template {
 }
 
 exec {
-  command = "postgrest ./postgrest.conf"
+  command = "cat ./postgrest.conf"
   splay = "2s"
 
   env {

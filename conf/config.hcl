@@ -1,15 +1,15 @@
 vault {
-  address = "https://vault.timbrook.tech"
+  address = "http://vault.default.svc.cluster.local"
   ssl {
-    enabled = true
-    verify = true 
+    enabled = false
+    verify = false 
   }
   vault_agent_token_file = "/var/run/secrets/.vault-token"
   renew_token = true
 }
 
 consul {
-  address = "https://consul.timbrook.tech"
+  address = "http://consul.default.svc.cluster.local"
 }
 
 ###

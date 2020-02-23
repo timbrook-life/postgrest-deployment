@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: 7imbrook/postgrest
-  sha: sha256:4ff88d576c15aeb28428df45b2ecfe2f3a6f53eac4d62934a89e5c0087cc4d58
+  sha: sha256:9afd9f0574729bff61531bb18903a7c70dcda94ecd1ce457f636066b0715aafe
 
 healthEndpoint: "/"
 
@@ -15,6 +15,10 @@ vault:
   enabled: true
   host: "http://vault.default.svc.cluster.local"
   role: "postgrest"
+
+environment:
+  - name: CONSUL_TOKEN
+    value: 54e5ee2a-8eb0-9abd-c91b-4fa1045f70f2
 
 resources:
   limits:

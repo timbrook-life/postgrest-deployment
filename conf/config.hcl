@@ -9,7 +9,7 @@ vault {
 }
 
 consul {
-  address = "http://consul.default.svc.cluster.local"
+  address = "http://consul-server.default.svc.cluster.local"
 }
 
 ###
